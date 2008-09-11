@@ -58,10 +58,10 @@ class Radoop
   end
   
   def copy_jruby_and_engine_jargs(jobconf)
-    jruby_libs(jobconf.get_radoop_home).each do |jrl|
-      f = HadoopUtils.copy_local_file_to_dfs(jobconf, jrl, jobconf.getRadoopDistributedCacheLocation, true)
-      jobconf.add_file_to_class_path(f)
-    end
+    f = HadoopUtils.copy_local_file_to_dfs(jobconf, "#{jobconf.get_radoop_home}/jars/jruby-engine.jar", jobconf.getRadoopDistributedCacheLocation, true)
+    jobconf.add_file_to_class_path(f)
+    f = HadoopUtils.copy_local_file_to_dfs(jobconf, "#{Java::JavaLang::System.getProperty('jruby.home')}/lib/jruby.jar", jobconf.getRadoopDistributedCacheLocation, true)
+    jobconf.add_file_to_class_path(f)
   end
 
   def add_archive_on_dfs_to_job_conf(jobconf, path, configuration_getter, configuration_setter)
