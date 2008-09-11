@@ -1,0 +1,32 @@
+#!/usr/bin/env jruby
+
+require 'getoptlong'
+require 'rdoc/usage'
+
+passthrough_cmd_names = %w(output_path input_path radoop_file radoop_class)
+passthrough_cmd_getopt_settings = passthrough_cmd_names.map {|c| ["--#{c}", GetoptLong::REQUIRED_ARGUMENT] }
+passthrough_cmd_getopt_settings << [ '--verbose', '-v',  GetoptLong::NO_ARGUMENT ]
+opts = GetoptLong.new(
+  *passthrough_cmd_getopt_settings
+)
+
+radoop_home = ENV["RADOOP_HOME"] = File.dirname(__FILE__) + "/.."
+rakefile =  "#{radoop_home}/lib/radoop.rake"
+
+extra_arguments = ''
+verbose = false
+
+opts.each do |opt, arg|
+  argument_without_dashes = opt.sub('--', '')
+  case argument_without_dashes
+  when 'verbose'
+    verbose = true
+    extra_arguments += " VERBOSE=1"
+  else
+    extra_arguments += " #{argument_without_dashes}=#{arg}"
+  end
+end
+
+cmd = "jruby -S rake -f #{rakefile} #{ARGV.join(" ") } #{extra_arguments} runcmd"
+puts cmd if verbose
+exec cmd
