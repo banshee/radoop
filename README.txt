@@ -1,10 +1,40 @@
-= rx
+= Radoop
 
-* FIX (url)
 
 == DESCRIPTION:
 
-FIX (describe your package)
+To use, you subclass Radoop like this:
+
+----
+require 'rubygems'
+require 'radoop'
+
+class WordCount < Radoop
+  include_package "org.apache.hadoop.io"
+
+  output_key_class Text
+  output_value_class IntWritable
+
+  def map(k, v, output, reporter)
+    values = v.to_s.split(/\W+/)
+    values.each do |v|
+      output.collect(v.to_hadoop_text, 1.to_int_writable)
+    end
+  end
+end
+----
+
+And then run the radoop command (here with --verbose turned on).  No compiling, no building jars, it should just feel something like running a normal Ruby script.
+
+Options are things like:
+
+--radoop_file word_count.rb # The name of the file containing the Radoop subclass
+--radoop_class WordCount # The name of the Radoop subclass
+--output_path /tmp/j1 
+--input_path /user/james/tmp/tale.txt,/user/james/tmp/tale1.txt -v
+
+Radoop handles zipping up your jruby install directory, your gem directories, and your ruby files, and puts them on the machines running tasks using the DistributedCache mechanism.
+
 
 == FEATURES/PROBLEMS:
 
